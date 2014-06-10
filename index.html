@@ -1,0 +1,75 @@
+<!doctype html>
+<html ng-app="locations">
+  <head>
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css">
+    <style>
+      html, body, #map {
+        height:100%;
+        width:100%;
+      }
+      #info {
+        position: absolute;
+        right: 0;
+        top: 0;
+        margin: 10px;
+        width: 500px;
+        padding: 5px;
+        background-color: #fff;
+        overflow-y: scroll;
+        max-height: 90%;
+        box-shadow: 0 0 10px 0 #222;
+      }
+      .location {
+        cursor: pointer;
+        padding: 5px;
+      }
+      .location:hover {
+        background-color: #ddd;
+      }
+      .location.selected {
+        background-color: #fcc;
+      }
+      .title {
+        font: 36px Segoe UI Light;
+      }
+      .tag {
+        background-color: #888;
+        color: #fff;
+        font: 12px;
+        padding: 3px;
+        border-radius: 3px;
+      }
+      .icon {
+        width: 20px;
+        height; 20px;
+      }
+    </style>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.17/angular.min.js"></script>
+    <script type="text/javascript" src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+    <script type="text/javascript" src="app.js"></script>
+    <script>
+      var map;
+      angular.element(document).ready(function(){
+        map = L.map('map').setView([51.505, -0.09], 13);
+        L.tileLayer('https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png', {
+          id: 'examples.map-i86knfo3'
+        }).addTo(map);
+      });
+    </script>
+  </head>
+  <body>
+    <div id="map"></div>
+    <div ng-controller="geoData as data" id="info">
+      <div ng-repeat="marker in data.markers" ng-controller="SelectController as selectCtrl" ng-click="selectCtrl.select(marker)" class="location">
+        <div class="title">{{marker.name}}</div>
+        <div ng-repeat="type in marker.types" style="display: inline">
+          <div class="tag" style="display: inline">{{type}}</div>
+        </div>
+        <div><img ng-src="{{marker.icon}}" class="icon">{{marker.vicinity}}</div>
+        <div ng-show="marker.rating">Rating: {{marker.rating}}</div>
+        <div ng-show="marker.price_level">Price: {{marker.price_level}}</div>
+      </div>
+    </div>
+  </body>
+</html>
