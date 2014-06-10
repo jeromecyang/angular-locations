@@ -5,24 +5,28 @@
     <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css">
     <style>
       html, body, #map {
-        height:100%;
-        width:100%;
+        height: 100%;
+        width: 100%;
       }
       #info {
         position: absolute;
         right: 0;
         top: 0;
         margin: 10px;
-        width: 500px;
+        width: 250px;
         padding: 5px;
         background-color: #fff;
         overflow-y: scroll;
         max-height: 90%;
         box-shadow: 0 0 10px 0 #222;
       }
+      .typeSelect {
+        padding: 0 3px 0 3px;
+      }
       .location {
         cursor: pointer;
         padding: 5px;
+        font-size: 12px;
       }
       .location:hover {
         background-color: #ddd;
@@ -31,14 +35,17 @@
         background-color: #fcc;
       }
       .title {
-        font: 36px Segoe UI Light;
+        font-size: 24px;
+        font-weight: 800;
+        line-height: 24px;
+        padding: 5px 0 5px 0;
       }
       .tag {
-        background-color: #888;
+        background-color: #aaa;
         color: #fff;
-        font: 12px;
-        padding: 3px;
-        border-radius: 3px;
+        font-size: 12px;
+        padding: 2px;
+        border-radius: 2px;
       }
       .icon {
         width: 20px;
@@ -48,25 +55,22 @@
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.17/angular.min.js"></script>
     <script type="text/javascript" src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
     <script type="text/javascript" src="app.js"></script>
-    <script>
-      var map;
-      angular.element(document).ready(function(){
-        map = L.map('map').setView([51.505, -0.09], 13);
-        L.tileLayer('https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png', {
-          id: 'examples.map-i86knfo3'
-        }).addTo(map);
-      });
-    </script>
   </head>
   <body>
     <div id="map"></div>
     <div ng-controller="geoData as data" id="info">
+      <div>{{data.number}} points of interest near you</div>
+      <div ng-repeat="type in data.types">
+        <div class="typeSelect"><input type="checkbox"> {{type}}</div>
+      </div>
+      <hr>
       <div ng-repeat="marker in data.markers" ng-controller="SelectController as selectCtrl" ng-click="selectCtrl.select(marker)" class="location">
         <div class="title">{{marker.name}}</div>
+        <img ng-src="{{marker.icon}}" class="icon">
         <div ng-repeat="type in marker.types" style="display: inline">
           <div class="tag" style="display: inline">{{type}}</div>
         </div>
-        <div><img ng-src="{{marker.icon}}" class="icon">{{marker.vicinity}}</div>
+        <div>{{marker.vicinity}}</div>
         <div ng-show="marker.rating">Rating: {{marker.rating}}</div>
         <div ng-show="marker.price_level">Price: {{marker.price_level}}</div>
       </div>

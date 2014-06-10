@@ -1,8 +1,28 @@
 (function(){
   var app = angular.module('locations', []);
+  var map;
   
   app.controller('geoData', function(){
     this.markers = markers;
+    this.number = this.markers.length;
+    this.types = ["all"];
+
+    map = L.map('map').setView([this.markers[0].geometry.location.lat, this.markers[0].geometry.location.lng], 13);
+    L.tileLayer('https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png', {
+      id: 'examples.map-i86knfo3'
+    }).addTo(map);
+    
+    for (var i=0; i<this.markers.length; i++) {
+      for (var j=0; j<this.markers[i].types.length; j++) {
+        if (this.types.indexOf(this.markers[i].types[j]) === -1) {
+          this.types.push(this.markers[i].types[j]);
+        };
+      };
+      
+      var coord = [this.markers[i].geometry.location.lat, this.markers[i].geometry.location.lng];
+      L.marker(coord).addTo(map);
+    };
+    console.log(Object.keys(map._layers));
   });
   
   app.controller('SelectController', function(){
@@ -11,7 +31,6 @@
       this.item = item;
       var coord = [item.geometry.location.lat, item.geometry.location.lng];
       map.setView(coord);
-      L.marker(coord).addTo(map);
     };
   });
   
