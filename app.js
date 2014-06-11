@@ -5,32 +5,87 @@
   app.controller('geoData', function(){
     this.markers = markers;
     this.number = this.markers.length;
-    this.types = ["all"];
+    this.types = [{ name: "(select all)", show: true }];
 
-    map = L.map('map').setView([this.markers[0].geometry.location.lat, this.markers[0].geometry.location.lng], 13);
+    map = L.map('map').setView([33.9693713,-118.2234347], 10);
     L.tileLayer('https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png', {
       id: 'examples.map-i86knfo3'
     }).addTo(map);
     
+    var namelist = [];
+    this.mapLayers = {};
     for (var i=0; i<this.markers.length; i++) {
       for (var j=0; j<this.markers[i].types.length; j++) {
-        if (this.types.indexOf(this.markers[i].types[j]) === -1) {
-          this.types.push(this.markers[i].types[j]);
+        if (namelist.indexOf(this.markers[i].types[j]) === -1) {
+          namelist.push(this.markers[i].types[j]);
+          this.types.push({ name: this.markers[i].types[j], show: true });
         };
       };
       
       var coord = [this.markers[i].geometry.location.lat, this.markers[i].geometry.location.lng];
-      L.marker(coord).addTo(map);
+      var markerOnMap = L.marker(coord).bindPopup('<b>' + this.markers[i].name + '</b><div>' + this.markers[i].vicinity + '</div>');
+      map.addLayer(markerOnMap);
+      markerOnMap.on('click', function(evt){
+        evt.target.openPopup();
+      });
+      
+      this.mapLayers[this.markers[i].id] = markerOnMap;
     };
-    console.log(Object.keys(map._layers));
-  });
-  
-  app.controller('SelectController', function(){
-    this.item = markers[0];
-    this.select = function(item){
-      this.item = item;
-      var coord = [item.geometry.location.lat, item.geometry.location.lng];
-      map.setView(coord);
+    
+    this.toggleType = function(type){
+      type.show = !type.show;
+      if (type.name === "(select all)") {
+        for (var i=0; i<this.types.length; i++) {
+          this.types[i].show = type.show;
+        };
+      } else {
+        var showSelectAll = true;
+        
+        for (var i=0; i<this.types.length; i++) {
+          if (this.types[i].name !== "(select all)" && !this.types[i].show) {
+            showSelectAll = false;
+          };
+        };
+        
+        for (var i=0; i<this.types.length; i++) {
+          if (this.types[i].name === "(select all)"){
+            this.types[i].show = showSelectAll;
+          };
+        };
+      };
+    };
+    
+    this.checkTypes = function(marker) {
+      var show = false;
+      for (var i=0; i<marker.types.length; i++) {
+        for (var j=0; j<this.types.length; j++) {
+          if (marker.types[i] === this.types[j].name && this.types[j].show) {
+            show = true;
+          };
+        };
+      };
+      
+      if (!show) {
+        map.removeLayer(this.mapLayers[marker.id]);
+      } else if (show) {
+        var onMap = false;
+        var layerIds = Object.keys(map._layers);
+        for (var i=0; i<layerIds.length; i++) {
+          if (this.mapLayers[marker.id] === map._layers[layerIds]) {
+            onMap = true;
+          };
+        };
+        
+        if (!onMap) {
+          map.addLayer(this.mapLayers[marker.id]);
+        };
+      };
+      
+      return show;
+    };
+    
+    this.highlightMarker = function(marker){
+      this.mapLayers[marker.id].openPopup();
     };
   });
   

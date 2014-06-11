@@ -59,12 +59,12 @@
   <body>
     <div id="map"></div>
     <div ng-controller="geoData as data" id="info">
-      <div>{{data.number}} points of interest near you</div>
+      <div><b>{{data.number}} points of interest near Los Angeles:</b></div>
       <div ng-repeat="type in data.types">
-        <div class="typeSelect"><input type="checkbox"> {{type}}</div>
+        <div class="typeSelect"><input type="checkbox" ng-checked="type.show" ng-click="data.toggleType(type)"> {{type.name}}</div>
       </div>
       <hr>
-      <div ng-repeat="marker in data.markers" ng-controller="SelectController as selectCtrl" ng-click="selectCtrl.select(marker)" class="location">
+      <div ng-repeat="marker in data.markers" ng-click="data.highlightMarker(marker)" ng-show="data.checkTypes(marker)" class="location">
         <div class="title">{{marker.name}}</div>
         <img ng-src="{{marker.icon}}" class="icon">
         <div ng-repeat="type in marker.types" style="display: inline">
